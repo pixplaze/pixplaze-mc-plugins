@@ -1,0 +1,6 @@
+name: SimpleEventTracker
+version: '1.0-SNAPSHOT'
+main: com.pixplaze.simpleeventtracker.SimpleEventTracker
+api-version: 1.18
+authors: [ pazik98 ]
+description: Simple event tracker for player actions
