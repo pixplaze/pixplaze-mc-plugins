@@ -19,9 +19,6 @@ public final class SimpleEventTracker extends JavaPlugin {
     }
 
     public static SimpleEventTracker getInstance() {
-        if (instance == null) {
-            instance = new SimpleEventTracker();
-        }
         return instance;
     }
 
@@ -36,14 +33,11 @@ public final class SimpleEventTracker extends JavaPlugin {
 
         /* Регистрируем все обработчики событий, используемые плагином */
         registerListeners();
-
-        /* Выводим сообщение о том, что плагин успешно запущен */
         logger.info("Enabled.");
     }
 
     @Override
     public void onDisable() {
-        /* Выводим сообщение о том, что работа плагина завершена */
         logger.info("Disabled.");
     }
 
