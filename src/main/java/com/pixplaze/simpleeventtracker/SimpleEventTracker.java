@@ -14,6 +14,10 @@ public final class SimpleEventTracker extends JavaPlugin {
     private Logger logger = this.getLogger();
     private FileConfiguration config = this.getConfig();
 
+    public SimpleEventTracker() {
+        instance = this;
+    }
+
     public static SimpleEventTracker getInstance() {
         if (instance == null) {
             instance = new SimpleEventTracker();
@@ -33,16 +37,18 @@ public final class SimpleEventTracker extends JavaPlugin {
         /* Регистрируем все обработчики событий, используемые плагином */
         registerListeners();
 
+        /* Выводим сообщение о том, что плагин успешно запущен */
         logger.info("Enabled.");
     }
 
     @Override
     public void onDisable() {
+        /* Выводим сообщение о том, что работа плагина завершена */
         logger.info("Disabled.");
     }
 
     private void generateConfig() {
-        /* Копируем содержимое из config.yml в ресурсах пакета и записываем в файл в дефлотной директории */
+        /* Копируем содержимое из config.yml в ресурсах пакета и записываем в файл в дефолтной директории */
         config.options().copyDefaults(true);
         saveDefaultConfig();
     }
