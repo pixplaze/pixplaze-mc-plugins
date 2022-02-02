@@ -9,18 +9,28 @@ import java.util.logging.Logger;
 
 public final class SimpleEventTracker extends JavaPlugin {
 
+    private static SimpleEventTracker instance;
+
     private Logger logger = this.getLogger();
     private FileConfiguration config = this.getConfig();
+
+    public static SimpleEventTracker getInstance() {
+        if (instance == null) {
+            instance = new SimpleEventTracker();
+        }
+        return instance;
+    }
 
     @Override
     public void onEnable() {
 
-        // Генерируем дефолтный конфиг, если его нет в директории плагина
+        /* Генерируем дефолтный конфиг, если его нет в директории плагина */
         if (!new File(config.getCurrentPath()).exists()) {
-            logger.info("Config isn't exist. Creating...");
+            logger.info("Config file isn't exist. Creating...");
             generateConfig();
         }
 
+        /* Регистрируем все обработчики событий, используемые плагином */
         registerListeners();
 
         logger.info("Enabled.");
@@ -32,6 +42,7 @@ public final class SimpleEventTracker extends JavaPlugin {
     }
 
     private void generateConfig() {
+        /* Копируем содержимое из config.yml в ресурсах пакета и записываем в файл в дефлотной директории */
         config.options().copyDefaults(true);
         saveDefaultConfig();
     }
