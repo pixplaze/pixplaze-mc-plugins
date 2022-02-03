@@ -1,6 +1,7 @@
 package com.pixplaze.simpleeventtracker.listener;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.pixplaze.simpleeventtracker.SimpleEventTracker;
 import com.pixplaze.simpleeventtracker.json.data.PlayerProfile;
 import org.bukkit.entity.Player;
@@ -8,9 +9,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,11 +24,13 @@ public class PlayerListener implements Listener {
         Player player = e.getPlayer();
         var profile = getPlayerProfile(player);
 
-        List<PlayerProfile> joinHistory = new ArrayList();
+        String joinHistoryData = readFromFile(SimpleEventTracker.getInstance().getDataFolder() +
+                "/userprofile.json");
+
+        /* Десериализуем прочитанный файл и добавляем к нему новую запись */
+        Type playerProfileList = new TypeToken<ArrayList<PlayerProfile>>(){}.getType();
+        List<PlayerProfile> joinHistory = gson.fromJson(joinHistoryData, playerProfileList);
         joinHistory.add(profile);
-
-        // TODO написать десериализацию для листа с профилями и реализовать чтение и запись истории
-
         writeToFile(gson.toJson(joinHistory));
     }
 
@@ -42,6 +45,21 @@ public class PlayerListener implements Listener {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static String readFromFile(String path) {
+        String data = "";
+
+        try (var br = new BufferedReader(new InputStreamReader(new FileInputStream(path),
+                StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                data += line;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return data;
     }
 
 }
