@@ -8,71 +8,62 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.checkerframework.checker.units.qual.A;
-
 import java.io.*;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 public class PlayerListener implements Listener {
 
-    private static final Logger logger = SimpleEventTracker.getInstance().getLogger();
     private static final Gson gson = new Gson();
-    private static final String filepath = SimpleEventTracker.getInstance().getDataFolder() + "/userprofile.json";
+    private static final String filePath = SimpleEventTracker.getInstance().getDataFolder() + "/userprofile.json";
+    private static final Logger logger = SimpleEventTracker.getInstance().getLogger();
 
     @EventHandler
     public static void onPlayerJoin(PlayerJoinEvent e) {
-        var profile = getPlayerProfile(e.getPlayer());
-        saveProfile(profile);
+        Player player = e.getPlayer();
+        var profile = getPlayerProfile(player);
+        savePlayerProfile(profile);
+    }
+
+    private static void savePlayerProfile(PlayerProfile profile) {
+        var file = new File(filePath);
+        var playerProfileType = new TypeToken<ArrayList<PlayerProfile>>(){}.getType();
+        var playerProfileList = new ArrayList<PlayerProfile>();
+        var json = "";
+        try {
+            if (file.createNewFile()) { // If file created (or not existed yet)
+                playerProfileList.add(profile);
+                logger.warning("File was not exits, creating file...");
+            } else { // Else if file already exist
+                playerProfileList = gson.fromJson(readFromFile(file), playerProfileType);
+                playerProfileList.add(profile);
+                logger.info("File exist, applying player profile...");
+            }
+            json = gson.toJson(playerProfileList);
+            logger.info(json);
+            writeToFile(file, json);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private static PlayerProfile getPlayerProfile(Player player) {
         return new PlayerProfile(player.getUniqueId(), player.getName());
     }
 
-    private static void saveProfile(PlayerProfile profile) {
-        var file = new File(filepath);
-        List<PlayerProfile> joinHistory = new ArrayList<>();
-
-        try {
-            if (file.createNewFile()) {
-                logger.info("userprofile.json doesn't exist. Creating...");
-            } else {
-                var joinHistoryData = readFromFile(file);
-                /* Десериализуем прочитанный файл */
-                Type playerProfileList = new TypeToken<ArrayList<PlayerProfile>>(){}.getType();
-                joinHistory = gson.fromJson(joinHistoryData, playerProfileList);
-            }
-            joinHistory.add(profile);
-            writeToFile(file, gson.toJson(joinHistory));
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private static void writeToFile(File file, String json) throws IOException {
+        FileWriter fw = new FileWriter(file);
+        fw.write(json);
+        fw.close();
     }
 
-    private static void writeToFile(File file, String json) {
-        try (FileWriter fw = new FileWriter(file)) {
-            fw.write(json);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private static String readFromFile(File file) throws IOException {
+        var br = new BufferedReader(new FileReader(file));
+        var sb = new StringBuilder();
+        String line;
+        while ((line = br.readLine()) != null) {
+            sb.append(line);
+        } br.close();
+        return sb.toString();
     }
-
-    private static String readFromFile(File file) {
-        String data = "";
-
-        try (var br = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                data += line;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return data;
-    }
-
 }
