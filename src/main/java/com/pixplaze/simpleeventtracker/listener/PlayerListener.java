@@ -20,7 +20,7 @@ public class PlayerListener implements Listener {
 
     @EventHandler
     public static void onPlayerJoin(PlayerJoinEvent e) {
-        Player player = e.getPlayer();
+        var player = e.getPlayer();
         var profile = getPlayerProfile(player);
         savePlayerProfile(profile);
     }
@@ -48,7 +48,7 @@ public class PlayerListener implements Listener {
     }
 
     private static void writeToFile(File file, String json) throws IOException {
-        FileWriter fw = new FileWriter(file);
+        var fw = new FileWriter(file);
         fw.write(json);
         fw.close();
     }
@@ -56,7 +56,7 @@ public class PlayerListener implements Listener {
     private static String readFromFile(File file) throws IOException {
         var br = new BufferedReader(new FileReader(file));
         var sb = new StringBuilder();
-        String line;
+        var line = "";
         while ((line = br.readLine()) != null) {
             sb.append(line);
         } br.close();
