@@ -31,17 +31,13 @@ public class PlayerListener implements Listener {
         var playerProfileList = new ArrayList<PlayerProfile>();
         var json = "";
         try {
-            if (file.createNewFile()) { // If file created (or not existed yet)
-                playerProfileList.add(profile);
-                logger.warning("File was not exits, creating file...");
-            } else { // Else if file already exist
+            if (!file.createNewFile()) { // If file was not created (was existed yet)
                 playerProfileList = gson.fromJson(readFromFile(file), playerProfileType);
-                playerProfileList.add(profile);
-                logger.info("File exist, applying player profile...");
             }
+            playerProfileList.add(profile);
             json = gson.toJson(playerProfileList);
-            logger.info(json);
             writeToFile(file, json);
+            logger.info(json);
         } catch (IOException e) {
             e.printStackTrace();
         }
